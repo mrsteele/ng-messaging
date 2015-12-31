@@ -1,0 +1,32 @@
+{
+  "name": "ng-messaging",
+  "description": "A promise service messaging angular plugin.",
+  "main": "index.js",
+  "authors": [
+    "Matthew Steele <matt@omnionline.us> (http://omnionline.us)"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "ng",
+    "messaging",
+    "messages",
+    "message"
+  ],
+  "homepage": "https://github.com/mrsteele/ng-messaging",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.8",
+    "bootstrap": "~3.3.6",
+    "angular-bootstrap": "~0.14.3"
+  }
+}

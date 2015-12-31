@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>ng-alerts tests</title>
+    <meta name="description" content="ng-alerts">
+    <meta name="author" content="Matthew Steele">
+    
+    <!-- JS: Dependencies -->
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    
+    <!-- JS: ng-alerts -->
+    <script src="../dist/ng-messaging.min.js"></script>
+    
+    <!-- CSS: Dependencies -->
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css">
+
+    <!-- CSS: ng-alerts -->
+    <link rel="stylesheet" href="../dist/ng-messaging.min.css">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <style>
+        .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+    </style>
+</head>
+
+<body ng-app="testApp">
+    
+    <script>
+        var testApp = angular.module('testApp', [
+            'ui.bootstrap',
+            'ngMessaging'
+        ]);
+        
+        testApp.controller('TestCtrl', function ($scope) {
+            $scope.test = "worked";
+        });
+        
+    </script>
+    
+    <div ng-controller="TestCtrl">
+    
+        <!-- navbar -->
+        <div class="navbar-default">
+            <div class="container">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a>
+                            Test {{test}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- jumbotron -->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="jumbotron">
+                        <h1>ng-messaging</h1>
+                        <p>A promise service messaging angular plugin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

@@ -1,6 +1,3 @@
-/*! ng-messaging 2015-12-31 */
-angular.module('ngMessaging', []);
-
 /**
  * Shows a simple alert total.
  * @param {Bool=} badge - To show the number as a badge.
@@ -20,12 +17,3 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
         };
     }
 ]);
-angular.module('ngMessaging').run(['$templateCache', function($templateCache) {
-  'use strict';
-
-  $templateCache.put('template/ng-messaging/messaging-area.html',
-    "<textarea class=\"ng-messaging-area form-control\"></textarea>\r" +
-    "\n"
-  );
-
-}]);

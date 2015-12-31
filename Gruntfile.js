@@ -64,7 +64,7 @@ module.exports = function (grunt) {
         
         // preserve templates
         ngtemplates: {
-            ngAlerts: {
+            ngMessaging: {
                 src: '**/*.html',
                 dest: 'dist/' + prefix + '.js',
                 cwd: 'src/tpls/',

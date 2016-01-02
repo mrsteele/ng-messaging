@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>ng-alerts tests</title>
+    <title>ng-messaging tests</title>
     <meta name="description" content="ng-alerts">
     <meta name="author" content="Matthew Steele">
     
@@ -11,7 +11,7 @@
     <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     
     <!-- JS: ng-alerts -->
-    <script src="../dist/ng-messaging.min.js"></script>
+    <script src="../dist/ng-messaging.js"></script>
     
     <!-- CSS: Dependencies -->
     <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css">
@@ -70,7 +70,8 @@
         
             <div class="row">
                 <div class="col-md-12">
-                    <ng-messaging-area class="test">
+                    <ng-messaging-list channel="abc123"></ng-messaging-list>
+                    <ng-messaging-area class="test" channel="abc123">
                         Press enter to post this!
                     </ng-messaging-area>
                 </div>

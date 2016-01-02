@@ -36,8 +36,19 @@
             'ngMessaging'
         ]);
         
-        testApp.controller('TestCtrl', function ($scope) {
+        testApp.controller('TestCtrl', function ($scope, $timeout, $q, ngMessagingManager) {
             $scope.test = "worked";
+            
+            ngMessagingManager.setMessageHandler(function (args) {
+                var deferred = $q.defer();
+                $timeout(function () {
+                    deferred.resolve({
+                        msg: args.msg
+                    });
+                });
+                return deferred.promise;
+            });
+            
         });
         
     </script>

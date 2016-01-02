@@ -16,11 +16,12 @@ angular.module('ngMessaging').directive('ngMessagingList', [
             templateUrl: 'template/ng-messaging/messaging-list.html',
             link: function ($scope, $element, $attrs) {
                 ngMessagingManager.addChannel($attrs.channel);
-//                
-//                ngMessagingManager.addArea($scope);
-//                $scope.$on('$destroy', function () {
-//                    ngMessagingManager.removeArea($scope);
-//                });
+                
+                $scope.$watch(function () {
+                    return ngMessagingManager.getChannelMsgs($attrs.channel);
+                }, function (data) {
+                    $scope.msgs = data;
+                });
             }
         };
     }

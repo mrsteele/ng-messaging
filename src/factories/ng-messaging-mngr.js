@@ -2,13 +2,16 @@
  * Manages all notification systems.
  */
 angular.module('ngMessaging').factory('ngMessagingManager', [
-    'ngMessaging',
     'NgMessagingMessage',
-    function (ngMessaging, NgMessagingMessage) {
+    '$q',
+    function (NgMessagingMessage, $q) {
         'use strict';
 
         var mngr = {},
-            channels = {};
+            channels = {},
+            messageHandler = function (args) {
+                return $q.reject("Message handler not set up.");
+            };
         
         function channelExists(id) {
             return (channels[id] !== undefined);
@@ -20,19 +23,28 @@ angular.module('ngMessaging').factory('ngMessagingManager', [
             }
         };
         
-        mngr.addMsg = function (args) {
-            if (args && args.channel && channelExists(args.channel)) {
-                ngMessaging(args).then(function (data) {
-                    console.log(data);
-                    //channels[id].push(new NgMessagingMessage(data));
-                }, function (error) {
-                    console.log('bad');
-                });
-                
-                return true;
+        mngr.getChannelMsgs = function (id) {
+            if (channelExists(id)) {
+                return channels[id];
             }
             
-            return false;
+            return [];
+        };
+        
+        mngr.addMsg = function (args) {
+            if (args && args.channel && channelExists(args.channel)) {
+                var deferred = messageHandler(args).then(function (data) {
+                    channels[args.channel].push(new NgMessagingMessage(data));
+                });
+                
+                return deferred;
+            }
+            
+            return $q.reject("Channel does not exist.");
+        };
+        
+        mngr.setMessageHandler = function (newHandler) {
+            messageHandler = newHandler;
         };
         
         return mngr;

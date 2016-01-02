@@ -1,4 +1,5 @@
-<div>
+<div ng-class="{'has-error': error.length}">
     <textarea ng-model="msg" class="ng-messaging-area form-control"></textarea>
+    <div class="help-block" ng-show="error.length">{{error}}</div>
     <button class="btn" ng-click="submit()">Submit</button>
 </div>

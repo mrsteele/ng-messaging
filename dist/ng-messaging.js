@@ -1,35 +1,5 @@
 /*! ng-messaging 2016-01-02 */
-angular.module('ngMessaging', ['ui.bootstrap'])
-
-    .provider('ngMessaging', function () {
-        'use strict';
-    
-        var ret;
-
-        this.setMessageHandler = function (newHandler) {
-            ret = newHandler;
-        };
-
-        this.$get = [
-            '$q',
-            '$timeout',
-            function ($q, $timeout) {
-                if (ret) {
-                    return ret;
-                } else {
-                    return function (args) {
-                        var defferred = $q.defer();
-                        $timeout(function () {
-                            defferred.resolve({
-                                msg: args.msg
-                            });
-                        })
-                        return defferred.promise;
-                    };
-                }
-            }
-        ];
-    });
+angular.module('ngMessaging', ['ui.bootstrap']);
 
 /**
  * Shows a simple alert total.
@@ -50,8 +20,19 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
             link: function ($scope, $element, $attrs) {
                 
                 $scope.channel = $attrs.channel;
+                
+                $scope.closeError = function () {
+                    $scope.error = "";
+                };
+                
                 $scope.submit = function () {
-                    ngMessagingManager.addMsg($scope);
+                    $scope.error = "";
+                    var deferred = ngMessagingManager.addMsg($scope);
+                    deferred.then(function () {
+                        $scope.msg = "";
+                    }, function (error) {
+                        $scope.error = error;
+                    });
                 };
 //                
 //                ngMessagingManager.addArea($scope);
@@ -81,11 +62,12 @@ angular.module('ngMessaging').directive('ngMessagingList', [
             templateUrl: 'template/ng-messaging/messaging-list.html',
             link: function ($scope, $element, $attrs) {
                 ngMessagingManager.addChannel($attrs.channel);
-//                
-//                ngMessagingManager.addArea($scope);
-//                $scope.$on('$destroy', function () {
-//                    ngMessagingManager.removeArea($scope);
-//                });
+                
+                $scope.$watch(function () {
+                    return ngMessagingManager.getChannelMsgs($attrs.channel);
+                }, function (data) {
+                    $scope.msgs = data;
+                });
             }
         };
     }
@@ -95,13 +77,16 @@ angular.module('ngMessaging').directive('ngMessagingList', [
  * Manages all notification systems.
  */
 angular.module('ngMessaging').factory('ngMessagingManager', [
-    'ngMessaging',
     'NgMessagingMessage',
-    function (ngMessaging, NgMessagingMessage) {
+    '$q',
+    function (NgMessagingMessage, $q) {
         'use strict';
 
         var mngr = {},
-            channels = {};
+            channels = {},
+            messageHandler = function (args) {
+                return $q.reject("Message handler not set up.");
+            };
         
         function channelExists(id) {
             return (channels[id] !== undefined);
@@ -113,19 +98,28 @@ angular.module('ngMessaging').factory('ngMessagingManager', [
             }
         };
         
-        mngr.addMsg = function (args) {
-            if (args && args.channel && channelExists(args.channel)) {
-                ngMessaging(args).then(function (data) {
-                    console.log(data);
-                    //channels[id].push(new NgMessagingMessage(data));
-                }, function (error) {
-                    console.log('bad');
-                });
-                
-                return true;
+        mngr.getChannelMsgs = function (id) {
+            if (channelExists(id)) {
+                return channels[id];
             }
             
-            return false;
+            return [];
+        };
+        
+        mngr.addMsg = function (args) {
+            if (args && args.channel && channelExists(args.channel)) {
+                var deferred = messageHandler(args).then(function (data) {
+                    channels[args.channel].push(new NgMessagingMessage(data));
+                });
+                
+                return deferred;
+            }
+            
+            return $q.reject("Channel does not exist.");
+        };
+        
+        mngr.setMessageHandler = function (newHandler) {
+            messageHandler = newHandler;
         };
         
         return mngr;
@@ -160,6 +154,7 @@ angular.module('ngMessaging').factory('NgMessagingMessage', [
                 id += 1;
             }
             
+            ids.push(id);
             return id;
         };
         
@@ -170,9 +165,11 @@ angular.module('ngMessaging').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('template/ng-messaging/messaging-area.html',
-    "<div>\r" +
+    "<div ng-class=\"{'has-error': error.length}\">\r" +
     "\n" +
     "    <textarea ng-model=\"msg\" class=\"ng-messaging-area form-control\"></textarea>\r" +
+    "\n" +
+    "    <div class=\"help-block\" ng-show=\"error.length\">{{error}}</div>\r" +
     "\n" +
     "    <button class=\"btn\" ng-click=\"submit()\">Submit</button>\r" +
     "\n" +

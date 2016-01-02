@@ -26,6 +26,7 @@ angular.module('ngMessaging').factory('NgMessagingMessage', [
                 id += 1;
             }
             
+            ids.push(id);
             return id;
         };
         

@@ -17,8 +17,19 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
             link: function ($scope, $element, $attrs) {
                 
                 $scope.channel = $attrs.channel;
+                
+                $scope.closeError = function () {
+                    $scope.error = "";
+                };
+                
                 $scope.submit = function () {
-                    ngMessagingManager.addMsg($scope);
+                    $scope.error = "";
+                    var deferred = ngMessagingManager.addMsg($scope);
+                    deferred.then(function () {
+                        $scope.msg = "";
+                    }, function (error) {
+                        $scope.error = error;
+                    });
                 };
 //                
 //                ngMessagingManager.addArea($scope);

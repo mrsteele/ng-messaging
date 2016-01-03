@@ -37,15 +37,23 @@
         ]);
         
         testApp.controller('TestCtrl', function ($scope, $timeout, $q, ngMessagingManager) {
-            $scope.test = "worked";
-            
             ngMessagingManager.setMessageHandler(function (args) {
                 var deferred = $q.defer();
                 $timeout(function () {
                     deferred.resolve({
                         msg: args.msg
                     });
-                });
+                }, 1000);
+                return deferred.promise;
+            });
+            
+            ngMessagingManager.setSyncHandler(function (channel) {
+                var deferred = $q.defer();
+                $timeout(function () {
+                    deferred.resolve([{
+                        msg: 'This is a pre-existing message.'
+                    }]);
+                }, 1000);
                 return deferred.promise;
             });
             
@@ -54,19 +62,6 @@
     </script>
     
     <div ng-controller="TestCtrl">
-    
-        <!-- navbar -->
-        <div class="navbar-default">
-            <div class="container">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a>
-                            Test {{test}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
 
         <!-- jumbotron -->
         <div class="container">

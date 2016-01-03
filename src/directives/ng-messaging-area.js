@@ -24,11 +24,14 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
                 
                 $scope.submit = function () {
                     $scope.error = "";
+                    $scope.submitting = true;
                     var deferred = ngMessagingManager.addMsg($scope);
                     deferred.then(function () {
                         $scope.msg = "";
                     }, function (error) {
                         $scope.error = error;
+                    }).then(function () {
+                        $scope.submitting = false;
                     });
                 };
 //                

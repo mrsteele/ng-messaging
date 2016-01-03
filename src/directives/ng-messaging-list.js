@@ -15,7 +15,11 @@ angular.module('ngMessaging').directive('ngMessagingList', [
             transclude: true,
             templateUrl: 'template/ng-messaging/messaging-list.html',
             link: function ($scope, $element, $attrs) {
-                ngMessagingManager.addChannel($attrs.channel);
+                ngMessagingManager.addChannel($attrs.channel).then(function (data) {
+                    $scope.msgs = data;
+                }, function (error) {
+                    console.log(error);
+                });
                 
                 $scope.$watch(function () {
                     return ngMessagingManager.getChannelMsgs($attrs.channel);

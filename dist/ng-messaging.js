@@ -27,11 +27,14 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
                 
                 $scope.submit = function () {
                     $scope.error = "";
+                    $scope.submitting = true;
                     var deferred = ngMessagingManager.addMsg($scope);
                     deferred.then(function () {
                         $scope.msg = "";
                     }, function (error) {
                         $scope.error = error;
+                    }).then(function () {
+                        $scope.submitting = false;
                     });
                 };
 //                
@@ -61,7 +64,11 @@ angular.module('ngMessaging').directive('ngMessagingList', [
             transclude: true,
             templateUrl: 'template/ng-messaging/messaging-list.html',
             link: function ($scope, $element, $attrs) {
-                ngMessagingManager.addChannel($attrs.channel);
+                ngMessagingManager.addChannel($attrs.channel).then(function (data) {
+                    $scope.msgs = data;
+                }, function (error) {
+                    console.log(error);
+                });
                 
                 $scope.$watch(function () {
                     return ngMessagingManager.getChannelMsgs($attrs.channel);
@@ -86,7 +93,18 @@ angular.module('ngMessaging').factory('ngMessagingManager', [
             channels = {},
             messageHandler = function (args) {
                 return $q.reject("Message handler not set up.");
+            },
+            syncHandler = function (args) {
+                return $q.reject("Sync handler not set up.");
             };
+        
+        mngr.setMessageHandler = function (newHandler) {
+            messageHandler = newHandler;
+        };
+        
+        mngr.setSyncHandler = function (newHandler) {
+            syncHandler = newHandler;
+        };
         
         function channelExists(id) {
             return (channels[id] !== undefined);
@@ -95,7 +113,10 @@ angular.module('ngMessaging').factory('ngMessagingManager', [
         mngr.addChannel = function (id) {
             if (!channelExists(id)) {
                 channels[id] = [];
+                return mngr.syncChannel(id);
             }
+            
+            return $q.resolve(channels[id]);
         };
         
         mngr.getChannelMsgs = function (id) {
@@ -118,8 +139,34 @@ angular.module('ngMessaging').factory('ngMessagingManager', [
             return $q.reject("Channel does not exist.");
         };
         
-        mngr.setMessageHandler = function (newHandler) {
-            messageHandler = newHandler;
+        mngr.syncChannel = function (channel) {
+            var i, ret;
+            
+            if (channel) {
+                if (!channelExists(channel)) {
+                    mngr.addChannel(channel);
+                }
+                ret = syncHandler(channel).then(function (data) {
+                    channels[channel] = [];
+                    if (data && data.length > 0) {
+                        for (i = 0; i < data.length; i += 1) {
+                            channels[channel].push(new NgMessagingMessage(data[i]));
+                        }
+                        return channels[channel];
+                    }
+                });
+
+                return ret;
+            } else {
+                ret = [];
+                for (i in channels) {
+                    if (channels.hasOwnProperty(i)) {
+                        ret.push(mngr.syncChannel(i));
+                    }
+                }
+                
+                return ret;
+            }
         };
         
         return mngr;
@@ -165,15 +212,15 @@ angular.module('ngMessaging').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('template/ng-messaging/messaging-area.html',
-    "<div ng-class=\"{'has-error': error.length}\">\r" +
+    "<form ng-class=\"{'has-error': error.length}\">\r" +
     "\n" +
-    "    <textarea ng-model=\"msg\" class=\"ng-messaging-area form-control\"></textarea>\r" +
+    "    <textarea ng-model=\"msg\" class=\"ng-messaging-area form-control\" ng-disabled=\"submitting\"></textarea>\r" +
     "\n" +
     "    <div class=\"help-block\" ng-show=\"error.length\">{{error}}</div>\r" +
     "\n" +
-    "    <button class=\"btn\" ng-click=\"submit()\">Submit</button>\r" +
+    "    <button class=\"btn\" ng-click=\"submit()\" ng-disabled=\"submitting\">Submit</button>\r" +
     "\n" +
-    "</div>\r" +
+    "</form>\r" +
     "\n"
   );
 

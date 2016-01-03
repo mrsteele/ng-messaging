@@ -13,13 +13,25 @@ angular.module('ngMessaging').directive('ngMessagingList', [
         return {
             replace: true,
             transclude: true,
+            scope: {
+                title: '@',
+                channel: '@'
+            },
             templateUrl: 'template/ng-messaging/messaging-list.html',
             link: function ($scope, $element, $attrs) {
+                
                 ngMessagingManager.addChannel($attrs.channel).then(function (data) {
                     $scope.msgs = data;
                 }, function (error) {
                     console.log(error);
                 });
+                
+                $scope.getTime = function (time) {
+                    var d = new Date(time);
+                    
+                    // @TODO: Make this a provider!!!
+                    return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+                };
                 
                 $scope.$watch(function () {
                     return ngMessagingManager.getChannelMsgs($attrs.channel);

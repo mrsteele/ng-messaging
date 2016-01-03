@@ -13,10 +13,11 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
         return {
             replace: true,
             transclude: true,
+            scope: {
+                channel: '@'
+            },
             templateUrl: 'template/ng-messaging/messaging-area.html',
             link: function ($scope, $element, $attrs) {
-                
-                $scope.channel = $attrs.channel;
                 
                 $scope.closeError = function () {
                     $scope.error = "";
@@ -34,11 +35,6 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
                         $scope.submitting = false;
                     });
                 };
-//                
-//                ngMessagingManager.addArea($scope);
-//                $scope.$on('$destroy', function () {
-//                    ngMessagingManager.removeArea($scope);
-//                });
             }
         };
     }

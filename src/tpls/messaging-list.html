@@ -1,3 +1,25 @@
-<ul>
-    <li ng-repeat="msg in msgs">{{msg}}</li>
-</ul>
+<table class="table table-bordered messaging-list messaging-list-{{channel}}">
+    <thead ng-show="title">
+        <tr>
+            <th>{{title}}</th>
+        </tr>
+    </thead>
+    <tbody ng-show="msgs.length > 0">
+        <tr ng-repeat="msg in msgs">
+            <td>
+                {{msg.msg}}
+                <br clear="all" />
+                <small class="text-muted pull-right">
+                    Posted at {{getTime(msg.time)}}
+                </small>
+            </td>
+        </tr>
+    </tbody>
+    <tbody ng-show="msgs.length === 0">
+        <tr>
+            <td class="text-muted">
+               No messages.
+            </td>
+        </tr>
+    </tbody>
+</table>

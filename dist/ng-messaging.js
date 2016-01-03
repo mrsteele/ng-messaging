@@ -16,10 +16,11 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
         return {
             replace: true,
             transclude: true,
+            scope: {
+                channel: '@'
+            },
             templateUrl: 'template/ng-messaging/messaging-area.html',
             link: function ($scope, $element, $attrs) {
-                
-                $scope.channel = $attrs.channel;
                 
                 $scope.closeError = function () {
                     $scope.error = "";
@@ -37,11 +38,6 @@ angular.module('ngMessaging').directive('ngMessagingArea', [
                         $scope.submitting = false;
                     });
                 };
-//                
-//                ngMessagingManager.addArea($scope);
-//                $scope.$on('$destroy', function () {
-//                    ngMessagingManager.removeArea($scope);
-//                });
             }
         };
     }
@@ -62,13 +58,25 @@ angular.module('ngMessaging').directive('ngMessagingList', [
         return {
             replace: true,
             transclude: true,
+            scope: {
+                title: '@',
+                channel: '@'
+            },
             templateUrl: 'template/ng-messaging/messaging-list.html',
             link: function ($scope, $element, $attrs) {
+                
                 ngMessagingManager.addChannel($attrs.channel).then(function (data) {
                     $scope.msgs = data;
                 }, function (error) {
                     console.log(error);
                 });
+                
+                $scope.getTime = function (time) {
+                    var d = new Date(time);
+                    
+                    // @TODO: Make this a provider!!!
+                    return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+                };
                 
                 $scope.$watch(function () {
                     return ngMessagingManager.getChannelMsgs($attrs.channel);
@@ -226,11 +234,55 @@ angular.module('ngMessaging').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('template/ng-messaging/messaging-list.html',
-    "<ul>\r" +
+    "<table class=\"table table-bordered messaging-list messaging-list-{{channel}}\">\r" +
     "\n" +
-    "    <li ng-repeat=\"msg in msgs\">{{msg}}</li>\r" +
+    "    <thead ng-show=\"title\">\r" +
     "\n" +
-    "</ul>"
+    "        <tr>\r" +
+    "\n" +
+    "            <th>{{title}}</th>\r" +
+    "\n" +
+    "        </tr>\r" +
+    "\n" +
+    "    </thead>\r" +
+    "\n" +
+    "    <tbody ng-show=\"msgs.length > 0\">\r" +
+    "\n" +
+    "        <tr ng-repeat=\"msg in msgs\">\r" +
+    "\n" +
+    "            <td>\r" +
+    "\n" +
+    "                {{msg.msg}}\r" +
+    "\n" +
+    "                <br clear=\"all\" />\r" +
+    "\n" +
+    "                <small class=\"text-muted pull-right\">\r" +
+    "\n" +
+    "                    Posted at {{getTime(msg.time)}}\r" +
+    "\n" +
+    "                </small>\r" +
+    "\n" +
+    "            </td>\r" +
+    "\n" +
+    "        </tr>\r" +
+    "\n" +
+    "    </tbody>\r" +
+    "\n" +
+    "    <tbody ng-show=\"msgs.length === 0\">\r" +
+    "\n" +
+    "        <tr>\r" +
+    "\n" +
+    "            <td class=\"text-muted\">\r" +
+    "\n" +
+    "               No messages.\r" +
+    "\n" +
+    "            </td>\r" +
+    "\n" +
+    "        </tr>\r" +
+    "\n" +
+    "    </tbody>\r" +
+    "\n" +
+    "</table>"
   );
 
 }]);

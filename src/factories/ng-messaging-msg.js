@@ -17,6 +17,8 @@ angular.module('ngMessaging').factory('NgMessagingMessage', [
             this.id = args.id || this.createId();
             this.msg = args.msg;
             this.time = args.time || Date.now();
+            
+            this.meta = args.meta || {};
         };
         
         Message.prototype.createId = function () {

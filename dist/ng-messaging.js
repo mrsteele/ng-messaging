@@ -1,4 +1,4 @@
-/*! ng-messaging 2016-01-02 */
+/*! ng-messaging 2016-01-03 */
 angular.module('ngMessaging', ['ui.bootstrap']);
 
 /**
@@ -75,7 +75,7 @@ angular.module('ngMessaging').directive('ngMessagingList', [
                     var d = new Date(time);
                     
                     // @TODO: Make this a provider!!!
-                    return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+                    return 'Posted at ' + (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
                 };
                 
                 $scope.$watch(function () {
@@ -200,6 +200,8 @@ angular.module('ngMessaging').factory('NgMessagingMessage', [
             this.id = args.id || this.createId();
             this.msg = args.msg;
             this.time = args.time || Date.now();
+            
+            this.meta = args.meta || {};
         };
         
         Message.prototype.createId = function () {
@@ -258,7 +260,7 @@ angular.module('ngMessaging').run(['$templateCache', function($templateCache) {
     "\n" +
     "                <small class=\"text-muted pull-right\">\r" +
     "\n" +
-    "                    Posted at {{getTime(msg.time)}}\r" +
+    "                    {{getTime(msg.time)}}\r" +
     "\n" +
     "                </small>\r" +
     "\n" +

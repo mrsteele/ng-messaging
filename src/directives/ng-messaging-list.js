@@ -30,7 +30,7 @@ angular.module('ngMessaging').directive('ngMessagingList', [
                     var d = new Date(time);
                     
                     // @TODO: Make this a provider!!!
-                    return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+                    return 'Posted at ' + (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
                 };
                 
                 $scope.$watch(function () {
